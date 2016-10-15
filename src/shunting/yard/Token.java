@@ -1,47 +1,29 @@
 package shunting.yard;
 
-class Token {
+public class Token {
 
-    private static final String STRING_EMPTY = "";
+    public enum Type {
+        NONE,
+        OPERAND,
+        OPERATOR,
+        LEFT_PARENTHESIS,
+        RIGHT_PARENTHESIS,
+        FUNCTION
+    }
 
-    private TokenType tokenType;
-    private String value;
+    private static final Token TOKEN_EMPTY = new Token(Type.NONE);
 
-    Token(TokenType type, String value) {
-        this.setValue(value);
-        this.setTokenType(type);
+    private Type type;
+
+    public Token(Type type) {
+        this.type = type;
     }
 
     static Token getEmpty() {
-        return new Token(TokenType.NONE, STRING_EMPTY);
+        return TOKEN_EMPTY;
     }
 
-    Token(TokenType type, char value) {
-        this(type, value + "");
-    }
-
-    String getValue() {
-        return value;
-    }
-
-    TokenType getTokenType() {
-        return this.tokenType;
-    }
-
-    void setValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException(
-                    "shunting.yard.Token value cannot be null");
-        }
-
-        this.value = value;
-    }
-
-    void setValue(char value) {
-        this.setValue(value + "");
-    }
-
-    void setTokenType(TokenType tokenType) {
-        this.tokenType = tokenType;
+    Type getType() {
+        return this.type;
     }
 }
