@@ -1,33 +1,22 @@
 package shunting.yard.operators;
 
 import shunting.yard.Token;
+import shunting.yard.misc.EvaluableToken;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public abstract class Operator extends Token {
-
-    public enum Associativity {
-        LEFT,
-        RIGHT
-    }
-
-    public enum Type {
-        UNARY,
-        BINARY
-    }
+public abstract class Operator extends EvaluableToken {
 
     private String name;
     private int precedence;
-    private Associativity associativity;
-    private Type type;
+    private boolean isBinary;
 
-    public Operator(String name, int precedence, Associativity associativity, Type type) {
-        super(Token.Type.OPERATOR);
+    public Operator(String name, int precedence, boolean isBinary) {
+        super(Token.Type.OPERATOR, isBinary ? 2 : 1);
         this.name = name;
         this.precedence = precedence;
-        this.associativity = associativity;
-        this.type = type;
+        this.isBinary = isBinary;
     }
 
     public String getName() {
@@ -46,20 +35,8 @@ public abstract class Operator extends Token {
         this.precedence = precedence;
     }
 
-    public Associativity getAssociativity() {
-        return associativity;
-    }
-
-    private void setAssociativity(Associativity associativity) {
-        this.associativity = associativity;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    private void setType(Type type) {
-        this.type = type;
+    public boolean isBinary() {
+        return isBinary;
     }
 
     public abstract BigDecimal eval(List<BigDecimal> args);

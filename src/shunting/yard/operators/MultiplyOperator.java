@@ -6,7 +6,7 @@ import java.util.List;
 public class MultiplyOperator extends Operator {
 
     public MultiplyOperator() {
-        super("*", 2, Associativity.LEFT, Type.BINARY);
+        super("*", 2, true);
     }
 
     @Override

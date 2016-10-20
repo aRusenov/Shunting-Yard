@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Main {
 
-    private static final String EXPRESSION = "55.5^(3)";//"sin(rad(((5+2)-4)^max(max(4, 3),2)-51))";
+    private static final String EXPRESSION = "2*2";
 
     public static void main(String[] args) {
         Evaluator evaluator = new Evaluator();

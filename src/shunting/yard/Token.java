@@ -23,7 +23,7 @@ public class Token {
         return TOKEN_EMPTY;
     }
 
-    Type getType() {
+    public Type getType() {
         return this.type;
     }
 }

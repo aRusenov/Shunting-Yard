@@ -1,19 +1,18 @@
 package shunting.yard.functions;
 
 import shunting.yard.Token;
+import shunting.yard.misc.EvaluableToken;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public abstract class Function extends Token {
+public abstract class Function extends EvaluableToken {
 
     private String name;
-    private int parameterCount;
 
-    public Function(String name, int parameterCount) {
-        super(Token.Type.FUNCTION);
+    public Function(String name, int minArgumentCount, int maxArgumentCount) {
+        super(Token.Type.FUNCTION, minArgumentCount, maxArgumentCount);
         setName(name);
-        setParameterCount(parameterCount);
     }
 
     public String getName() {
@@ -30,14 +29,6 @@ public abstract class Function extends Token {
         }
 
         this.name = name;
-    }
-
-    private void setParameterCount(int parameterCount) {
-        this.parameterCount = parameterCount;
-    }
-
-    public int getParameterCount() {
-        return parameterCount;
     }
 
     public abstract BigDecimal eval(List<BigDecimal> args);

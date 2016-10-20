@@ -3,13 +3,14 @@ package shunting.yard.misc;
 import shunting.yard.Token;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-public class Operand extends Token {
+public class Operand extends EvaluableToken {
 
     private BigDecimal value;
 
     public Operand(BigDecimal value) {
-        super(Token.Type.OPERAND);
+        super(Token.Type.OPERAND, 0);
         this.value = value;
     }
 
@@ -17,7 +18,13 @@ public class Operand extends Token {
         this(new BigDecimal(strValue));
     }
 
+
     public BigDecimal getValue() {
+        return value;
+    }
+
+    @Override
+    public BigDecimal eval(List<BigDecimal> args) {
         return value;
     }
 }

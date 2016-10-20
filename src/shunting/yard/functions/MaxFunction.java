@@ -6,7 +6,7 @@ import java.util.List;
 public class MaxFunction extends Function {
 
     public MaxFunction() {
-        super("max", -1);
+        super("max", 1, Integer.MAX_VALUE);
     }
 
     @Override

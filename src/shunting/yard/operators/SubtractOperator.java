@@ -6,7 +6,7 @@ import java.util.List;
 public class SubtractOperator extends Operator {
 
     public SubtractOperator() {
-        super("-", 1, Associativity.LEFT, Type.BINARY);
+        super("-", 1, true);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.List;
 public class DivideOperator extends Operator {
 
     public DivideOperator() {
-        super("/", 2, Associativity.LEFT, Type.BINARY);
+        super("/", 2, true);
     }
 
     @Override

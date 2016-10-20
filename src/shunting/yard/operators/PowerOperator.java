@@ -7,7 +7,7 @@ import java.util.List;
 public class PowerOperator extends Operator {
 
     public PowerOperator() {
-        super("^", 3, Operator.Associativity.LEFT, Operator.Type.BINARY);
+        super("^", 3, true);
     }
 
     @Override

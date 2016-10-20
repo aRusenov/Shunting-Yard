@@ -6,7 +6,7 @@ import java.util.List;
 public class MinFunction extends Function {
 
     public MinFunction() {
-        super("min", -1);
+        super("min", 1, Integer.MAX_VALUE);
     }
 
     @Override
