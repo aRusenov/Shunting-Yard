@@ -27,7 +27,7 @@ class PostfixConverter {
         this.functions = functions;
     }
 
-    Queue<EvaluableToken> convertToPostfixNotation(String expression) throws IOException {
+    Queue<EvaluableToken> convertToPostfixNotation(String expression) {
         lastToken = Token.getEmpty();
         currentToken = null;
         operatorStack.clear();

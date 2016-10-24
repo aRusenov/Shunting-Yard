@@ -43,12 +43,8 @@ public class Evaluator {
     }
 
     public BigDecimal eval(String expression) {
-        try {
-            Queue<EvaluableToken> tokens = postfixConverter.convertToPostfixNotation(expression);
-            return evaluate(tokens);
-        } catch (IOException e) {
-            throw new InvalidExpressionException("Error parsing expression", e);
-        }
+        Queue<EvaluableToken> tokens = postfixConverter.convertToPostfixNotation(expression);
+        return evaluate(tokens);
     }
 
     private static BigDecimal evaluate(Queue<EvaluableToken> tokens) {
