@@ -40,7 +40,7 @@ class PostfixConverter {
             String token = tokens.get(i);
 
             if (token.equals("-") && (lastToken.getType() == Token.Type.LEFT_PARENTHESIS ||
-                    lastToken.getType() == Token.Type.OPERATOR)) {
+                    lastToken.getType() == Token.Type.OPERATOR || i == 0)) {
                 token = "#"; // Unary minus
             }
 
