@@ -4,10 +4,9 @@ import shunting.yard.functions.AverageFunction;
 import shunting.yard.functions.Function;
 import shunting.yard.functions.MaxFunction;
 import shunting.yard.functions.MinFunction;
-import shunting.yard.misc.EvaluableToken;
+import shunting.yard.misc.Operand;
 import shunting.yard.operators.*;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -43,43 +42,82 @@ public class Evaluator {
     }
 
     public BigDecimal eval(String expression) {
-        Queue<EvaluableToken> tokens = postfixConverter.convertToPostfixNotation(expression);
+        Queue<Token> tokens = postfixConverter.convertToPostfixNotation(expression);
         return evaluate(tokens);
     }
 
-    private static BigDecimal evaluate(Queue<EvaluableToken> tokens) {
-        Stack<BigDecimal> operands = new Stack<>();
-        ArrayList<BigDecimal> argsList = new ArrayList<>(4); // Reuse array
+    private static BigDecimal evaluate(Queue<Token> tokens) {
+        Stack<Token> operands = new Stack<>();
+        ArrayList<BigDecimal> functionArgsList = new ArrayList<>(4); // Reuse array
         while (tokens.size() > 0) {
-            EvaluableToken token = tokens.remove();
+            Token token = tokens.remove();
+            if (token.getType() == Token.Type.LEFT_PARENTHESIS || token.getType() == Token.Type.OPERAND) {
+                operands.push(token);
+            } else if (token.getType() == Token.Type.OPERATOR) {
+                Operator operator = (Operator) token;
+                int expectedArgs = operator.isBinary() ? 2 : 1;
+                if (operands.size() < expectedArgs) {
+                    throw new InvalidExpressionException(
+                            String.format("Operator %s expects %d arguments. Available: %d",
+                                    operator.getName(), expectedArgs, operands.size()));
+                }
 
-            argsList.clear();
-            getArguments(operands, argsList, token);
-            Collections.reverse(argsList);
-
-            BigDecimal result = token.eval(argsList);
-            operands.push(result);
+                BigDecimal result = evaluateOperator(operands, operator);
+                operands.push(new Operand(result));
+            } else if (token.getType() == Token.Type.FUNCTION) {
+                Function function = (Function) token;
+                BigDecimal result = evaluateFunction(operands, functionArgsList, function);
+                operands.push(new Operand(result));
+                functionArgsList.clear();
+            }
         }
 
         if (operands.size() != 1) {
             throw new InvalidExpressionException("The expression is invalid");
         }
 
-        return operands.pop();
+        return ((Operand)operands.pop()).getValue();
     }
 
-    private static void getArguments(Stack<BigDecimal> operands, List<BigDecimal> output, EvaluableToken token) {
-        if (operands.size() < token.getMinArgsCount()) {
-            throw new InvalidExpressionException(
-                    String.format("Token '%s' expects at least %d arguments. Available: %d.",
-                            token.toString(), token.getMinArgsCount(), operands.size()));
+    private static BigDecimal evaluateFunction(Stack<Token> operands, ArrayList<BigDecimal> argsList, Function function) {
+        int givenArgs = 0;
+        while (operands.size() > 0 && givenArgs < function.getMaxArgs()) {
+            Token operand = operands.pop();
+            if (operand.getType() == Token.Type.LEFT_PARENTHESIS) {
+                break;
+            }
+
+            argsList.add(((Operand) operand).getValue());
+            givenArgs++;
         }
 
-        int expectedMaxArgs = token.getMaxArgsCount();
-        int givenArgs = 0;
-        while (operands.size() > 0 && givenArgs < expectedMaxArgs) {
-            output.add(operands.pop());
-            givenArgs++;
+        if (givenArgs < function.getMinArgs()) {
+            throw new InvalidExpressionException(
+                    String.format("Function %s expects at least %d argument(s). Available: %d.",
+                            function.getName(), function.getMinArgs(), givenArgs));
+        }
+
+        Collections.reverse(argsList);
+        return function.eval(argsList);
+    }
+
+    private static BigDecimal evaluateOperator(Stack<Token> operands, Operator operator) {
+        BigDecimal valB = null, valA = null;
+        Token opB = operands.pop();
+        checkNotLeftParenthesis(opB);
+        valB = ((Operand)opB).getValue();
+        if (operator.isBinary()) {
+            Token opA = operands.pop();
+            checkNotLeftParenthesis(opA);
+            valA = ((Operand)opA).getValue();
+        }
+
+        return operator.eval(valB, valA);
+    }
+
+    private static void checkNotLeftParenthesis(Token token) {
+        if (token != null && token.getType() == Token.Type.LEFT_PARENTHESIS) {
+            throw new InvalidExpressionException("Expected argument. Got '(' instead.");
         }
     }
 }

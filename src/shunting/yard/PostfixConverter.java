@@ -1,12 +1,10 @@
 package shunting.yard;
 
 import shunting.yard.functions.Function;
-import shunting.yard.misc.EvaluableToken;
 import shunting.yard.misc.LeftParenthesis;
 import shunting.yard.misc.Operand;
 import shunting.yard.operators.Operator;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -27,23 +25,23 @@ class PostfixConverter {
         this.functions = functions;
     }
 
-    Queue<EvaluableToken> convertToPostfixNotation(String expression) {
+    Queue<Token> convertToPostfixNotation(String expression) {
         lastToken = Token.getEmpty();
         currentToken = null;
         operatorStack.clear();
 
         Tokenizer tokenizer = new Tokenizer(expression);
-        Queue<EvaluableToken> output = new ArrayDeque<>();
+        Queue<Token> output = new ArrayDeque<>();
         while (tokenizer.hasNext()) {
             int index = tokenizer.getIndex();
             String token = tokenizer.getNext();
             if (token.equals("-") && (lastToken.getType() == Token.Type.LEFT_PARENTHESIS ||
-                    lastToken.getType() == Token.Type.OPERATOR || tokenizer.getCount() == 0)) {
+                    lastToken.getType() == Token.Type.OPERATOR || tokenizer.getCount() == 1)) {
                 token = "#"; // Unary minus
             }
 
             if (tryReadNumber(token)) {
-                output.add((Operand) currentToken);
+                output.add(currentToken);
             } else if (tryReadOperator(token)) {
                 if (lastToken.getType() == OPERATOR && ((Operator)currentToken).isBinary()) {
                     String message = String.format(
@@ -66,6 +64,7 @@ class PostfixConverter {
                 }
 
                 currentToken = LEFT_PARENTHESIS;
+                output.add(currentToken);
             } else if (token.equals("(")) {
                 currentToken = LEFT_PARENTHESIS;
                 operatorStack.push(currentToken);
@@ -79,7 +78,7 @@ class PostfixConverter {
                     if (operator.getType() == Token.Type.LEFT_PARENTHESIS) {
                         break;
                     } else {
-                        output.add((EvaluableToken) operator);
+                        output.add(operator);
                         if (operator.getType() == Token.Type.FUNCTION) {
                             break;
                         }
@@ -96,7 +95,7 @@ class PostfixConverter {
                     }
 
                     Token operator = operatorStack.pop();
-                    output.add((EvaluableToken) operator);
+                    output.add(operator);
                 }
             } else {
                 if (token.trim().isEmpty()) {
@@ -148,18 +147,18 @@ class PostfixConverter {
                 String.format("Invalid token '%s' at index %d", token, index));
     }
 
-    private void clearOperatorStack(Queue<EvaluableToken> output) {
+    private void clearOperatorStack(Queue<Token> output) {
         while (operatorStack.size() > 0) {
             Token token = operatorStack.pop();
             if (token.getType() == Token.Type.LEFT_PARENTHESIS || token.getType() == Token.Type.FUNCTION) {
                 throw new InvalidExpressionException("Inconsistent number of parenthesis");
             }
 
-            output.add((Operator) token);
+            output.add(token);
         }
     }
 
-    private void popToOutput(Operator currentOperator, Queue<EvaluableToken> output) {
+    private void popToOutput(Operator currentOperator, Queue<Token> output) {
         while (operatorStack.size() > 0) {
             Token topOperator = operatorStack.peek();
             if (topOperator.getType() != OPERATOR) {
@@ -169,7 +168,7 @@ class PostfixConverter {
             boolean hasPrecedence = ((Operator) topOperator).getPrecedence() >= currentOperator.getPrecedence();
             if (hasPrecedence) {
                 Token poppedToken = operatorStack.pop();
-                output.add((Operator) poppedToken);
+                output.add(poppedToken);
             } else {
                 break;
             }

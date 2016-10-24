@@ -5,12 +5,12 @@ import shunting.yard.Token;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Operand extends EvaluableToken {
+public class Operand extends Token {
 
     private BigDecimal value;
 
     public Operand(BigDecimal value) {
-        super(Token.Type.OPERAND, 0);
+        super(Token.Type.OPERAND);
         this.value = value;
     }
 
@@ -18,13 +18,7 @@ public class Operand extends EvaluableToken {
         this(new BigDecimal(strValue));
     }
 
-
     public BigDecimal getValue() {
-        return value;
-    }
-
-    @Override
-    public BigDecimal eval(List<BigDecimal> args) {
         return value;
     }
 }

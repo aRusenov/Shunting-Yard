@@ -1,5 +1,7 @@
 package shunting.yard.operators;
 
+import com.sun.istack.internal.Nullable;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
@@ -11,7 +13,7 @@ public class DivideOperator extends Operator {
     }
 
     @Override
-    public BigDecimal eval(List<BigDecimal> args) {
-        return args.get(0).divide(args.get(1), MathContext.DECIMAL128);
+    public BigDecimal eval(BigDecimal arg1, @Nullable BigDecimal arg2) {
+        return arg1.divide(arg2, MathContext.DECIMAL128);
     }
 }

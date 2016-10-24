@@ -1,19 +1,18 @@
 package shunting.yard.operators;
 
+import com.sun.istack.internal.Nullable;
 import shunting.yard.Token;
-import shunting.yard.misc.EvaluableToken;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-public abstract class Operator extends EvaluableToken {
+public abstract class Operator extends Token {
 
     private String name;
     private int precedence;
     private boolean isBinary;
 
     public Operator(String name, int precedence, boolean isBinary) {
-        super(Token.Type.OPERATOR, isBinary ? 2 : 1);
+        super(Token.Type.OPERATOR);
         this.name = name;
         this.precedence = precedence;
         this.isBinary = isBinary;
@@ -39,7 +38,7 @@ public abstract class Operator extends EvaluableToken {
         return isBinary;
     }
 
-    public abstract BigDecimal eval(List<BigDecimal> args);
+    public abstract BigDecimal eval(BigDecimal arg1, @Nullable BigDecimal arg2);
 
     @Override
     public String toString() {

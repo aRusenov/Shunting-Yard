@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Main {
 
-    private static final String EXPRESSION = "2 + 4 & maxe(2,3)";
+    private static final String EXPRESSION = "-2 + 4 ^ min()";
 
     public static void main(String[] args) {
         Evaluator evaluator = new Evaluator();

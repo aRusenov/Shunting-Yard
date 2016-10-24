@@ -1,17 +1,20 @@
 package shunting.yard.functions;
 
 import shunting.yard.Token;
-import shunting.yard.misc.EvaluableToken;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public abstract class Function extends EvaluableToken {
+public abstract class Function extends Token {
 
     private String name;
+    private int minArgs;
+    private int maxArgs;
 
-    public Function(String name, int minArgumentCount, int maxArgumentCount) {
-        super(Token.Type.FUNCTION, minArgumentCount, maxArgumentCount);
+    public Function(String name, int minArgs, int maxArgs) {
+        super(Token.Type.FUNCTION);
+        this.minArgs = minArgs;
+        this.maxArgs = maxArgs;
         setName(name);
     }
 
@@ -29,6 +32,14 @@ public abstract class Function extends EvaluableToken {
         }
 
         this.name = name;
+    }
+
+    public int getMinArgs() {
+        return minArgs;
+    }
+
+    public int getMaxArgs() {
+        return maxArgs;
     }
 
     public abstract BigDecimal eval(List<BigDecimal> args);
