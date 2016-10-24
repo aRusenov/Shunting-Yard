@@ -7,8 +7,6 @@ import shunting.yard.misc.Operand;
 import shunting.yard.operators.Operator;
 
 import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -34,13 +32,13 @@ class PostfixConverter {
         currentToken = null;
         operatorStack.clear();
 
+        Tokenizer tokenizer = new Tokenizer(expression);
         Queue<EvaluableToken> output = new ArrayDeque<>();
-        List<String> tokens = tokenize(expression);
-        for (int i = 0; i < tokens.size(); i++) {
-            String token = tokens.get(i);
-
+        while (tokenizer.hasNext()) {
+            int index = tokenizer.getIndex();
+            String token = tokenizer.getNext();
             if (token.equals("-") && (lastToken.getType() == Token.Type.LEFT_PARENTHESIS ||
-                    lastToken.getType() == Token.Type.OPERATOR || i == 0)) {
+                    lastToken.getType() == Token.Type.OPERATOR || tokenizer.getCount() == 0)) {
                 token = "#"; // Unary minus
             }
 
@@ -49,8 +47,8 @@ class PostfixConverter {
             } else if (tryReadOperator(token)) {
                 if (lastToken.getType() == OPERATOR && ((Operator)currentToken).isBinary()) {
                     String message = String.format(
-                            "Operator inconsistency. %s cannot follow %s",
-                            token, ((Operator)lastToken).getName());
+                            "Operator inconsistency. %s cannot follow %s at index %d",
+                            token, ((Operator)lastToken).getName(), index);
 
                     throw new InvalidExpressionException(message);
                 }
@@ -60,13 +58,14 @@ class PostfixConverter {
                 operatorStack.push(currentToken);
             } else if (tryReadFunction(token)) {
                 operatorStack.push(currentToken);
-                String nextToken = i < tokens.size() - 1 ? tokens.get(i + 1) : null;
+                String nextToken = tokenizer.hasNext() ? tokenizer.getNext() : null;
                 if (nextToken == null || !nextToken.equals("(")) {
-                    throw new InvalidExpressionException("Missing left parenthesis after token " + token);
+                    throw new InvalidExpressionException(
+                            String.format("Missing left parenthesis after token %s at index %d",
+                                    token, index));
                 }
 
                 currentToken = LEFT_PARENTHESIS;
-                i++;
             } else if (token.equals("(")) {
                 currentToken = LEFT_PARENTHESIS;
                 operatorStack.push(currentToken);
@@ -104,7 +103,7 @@ class PostfixConverter {
                     continue;
                 }
 
-                throwInvalidToken(token);
+                throwInvalidToken(token, index);
             }
 
             lastToken = currentToken;
@@ -144,35 +143,15 @@ class PostfixConverter {
         }
     }
 
-    private static List<String> tokenize(String s) throws IOException {
-        StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(s));
-        tokenizer.ordinaryChar('-');  // Don't parse minus as part of numbers.
-        List<String> tokens = new ArrayList<>();
-        while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
-            switch (tokenizer.ttype) {
-                case StreamTokenizer.TT_NUMBER:
-                    tokens.add(String.valueOf(tokenizer.nval));
-                    break;
-                case StreamTokenizer.TT_WORD:
-                    tokens.add(tokenizer.sval);
-                    break;
-                default:  // operator
-                    tokens.add(String.valueOf((char) tokenizer.ttype));
-            }
-        }
-
-        return tokens;
-    }
-
-    private static void throwInvalidToken(String token) {
+    private static void throwInvalidToken(String token, int index) {
         throw new InvalidExpressionException(
-                String.format("Invalid token '%s'", token));
+                String.format("Invalid token '%s' at index %d", token, index));
     }
 
     private void clearOperatorStack(Queue<EvaluableToken> output) {
         while (operatorStack.size() > 0) {
             Token token = operatorStack.pop();
-            if (token.getType() == Token.Type.LEFT_PARENTHESIS) {
+            if (token.getType() == Token.Type.LEFT_PARENTHESIS || token.getType() == Token.Type.FUNCTION) {
                 throw new InvalidExpressionException("Inconsistent number of parenthesis");
             }
 

@@ -6,7 +6,7 @@ public class InvalidExpressionException extends RuntimeException {
         super(message);
     }
 
-    public InvalidExpressionException(Throwable cause) {
-        super(cause);
+    public InvalidExpressionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

@@ -47,7 +47,7 @@ public class Evaluator {
             Queue<EvaluableToken> tokens = postfixConverter.convertToPostfixNotation(expression);
             return evaluate(tokens);
         } catch (IOException e) {
-            throw new InvalidExpressionException(e);
+            throw new InvalidExpressionException("Error parsing expression", e);
         }
     }
 
