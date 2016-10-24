@@ -15,6 +15,7 @@ public class Evaluator {
 
     private Map<String, Function> functions;
     private Map<String, Operator> operators;
+    private PostfixConverter postfixConverter;
 
     public Evaluator() {
         operators = new HashMap<>();
@@ -23,11 +24,14 @@ public class Evaluator {
         addOperator(new MultiplyOperator());
         addOperator(new DivideOperator());
         addOperator(new PowerOperator());
+        addOperator(new MinusOperator());
 
         functions = new HashMap<>();
         addFunction(new MinFunction());
         addFunction(new MaxFunction());
         addFunction(new AverageFunction());
+
+        postfixConverter = new PostfixConverter(operators, functions);
     }
 
     public void addOperator(Operator operator) {
@@ -40,7 +44,7 @@ public class Evaluator {
 
     public BigDecimal eval(String expression) {
         try {
-            Queue<EvaluableToken> tokens = PostfixConverter.convertToPostfixNotation(expression, operators, functions);
+            Queue<EvaluableToken> tokens = postfixConverter.convertToPostfixNotation(expression);
             return evaluate(tokens);
         } catch (IOException e) {
             throw new InvalidExpressionException(e);
@@ -71,7 +75,7 @@ public class Evaluator {
     private static void getArguments(Stack<BigDecimal> operands, List<BigDecimal> output, EvaluableToken token) {
         if (operands.size() < token.getMinArgsCount()) {
             throw new InvalidExpressionException(
-                    String.format("Token %s expects at least %d arguments. Available: %d.",
+                    String.format("Token '%s' expects at least %d arguments. Available: %d.",
                             token.toString(), token.getMinArgsCount(), operands.size()));
         }
 

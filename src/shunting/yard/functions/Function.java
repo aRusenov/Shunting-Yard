@@ -32,4 +32,9 @@ public abstract class Function extends EvaluableToken {
     }
 
     public abstract BigDecimal eval(List<BigDecimal> args);
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Main {
 
-    private static final String EXPRESSION = "2*2";
+    private static final String EXPRESSION = "4--3*2";
 
     public static void main(String[] args) {
         Evaluator evaluator = new Evaluator();

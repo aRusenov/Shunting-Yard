@@ -40,4 +40,9 @@ public abstract class Operator extends EvaluableToken {
     }
 
     public abstract BigDecimal eval(List<BigDecimal> args);
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }
