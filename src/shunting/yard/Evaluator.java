@@ -106,22 +106,18 @@ public class Evaluator {
     }
 
     private static BigDecimal evaluateOperator(Stack<Token> operands, Operator operator) {
-        BigDecimal valB, valA = null;
-        Token opB = operands.pop();
-        checkNotLeftParenthesis(opB);
-        valB = ((Operand)opB).getValue();
-        if (operator.isBinary()) {
-            Token opA = operands.pop();
-            checkNotLeftParenthesis(opA);
-            valA = ((Operand)opA).getValue();
-        }
+        BigDecimal valB = popOperand(operands).getValue();
+        BigDecimal valA = operator.isBinary() ? popOperand(operands).getValue() : null;
 
         return operator.eval(valA, valB);
     }
 
-    private static void checkNotLeftParenthesis(Token token) {
-        if (token != null && token.getType() == Token.Type.LEFT_PARENTHESIS) {
+    private static Operand popOperand(Stack<Token> operands) {
+        Token token = operands.pop();
+        if (token.getType() == Token.Type.LEFT_PARENTHESIS) {
             throw new InvalidExpressionException("Expected argument. Got '(' instead.");
         }
+
+        return (Operand) token;
     }
 }
