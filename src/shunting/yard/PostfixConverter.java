@@ -59,7 +59,7 @@ class PostfixConverter {
                 String nextToken = tokenizer.hasNext() ? tokenizer.getNext() : null;
                 if (nextToken == null || !nextToken.equals("(")) {
                     throw new InvalidExpressionException(
-                            String.format("Missing left parenthesis after token %s at index %d",
+                            String.format("Missing left parenthesis after token '%s' at index %d",
                                     token, index));
                 }
 

@@ -81,19 +81,23 @@ public class Evaluator {
 
     private static BigDecimal evaluateFunction(Stack<Token> operands, ArrayList<BigDecimal> argsList, Function function) {
         int givenArgs = 0;
-        while (operands.size() > 0 && givenArgs < function.getMaxArgs()) {
+        while (operands.size() > 0 &&
+                operands.peek().getType() == Token.Type.LEFT_PARENTHESIS &&
+                givenArgs < function.getMaxArgs()) {
             Token operand = operands.pop();
-            if (operand.getType() == Token.Type.LEFT_PARENTHESIS) {
-                break;
-            }
-
             argsList.add(((Operand) operand).getValue());
             givenArgs++;
         }
 
+        if (operands.size() > 0 && operands.peek().getType() == Token.Type.LEFT_PARENTHESIS) {
+            operands.pop();
+        } else {
+            throw new InvalidExpressionException("Invalid expression");
+        }
+
         if (givenArgs < function.getMinArgs()) {
             throw new InvalidExpressionException(
-                    String.format("Function %s expects at least %d argument(s). Available: %d.",
+                    String.format("Function '%s' expects at least %d argument(s). Available: %d.",
                             function.getName(), function.getMinArgs(), givenArgs));
         }
 
@@ -102,7 +106,7 @@ public class Evaluator {
     }
 
     private static BigDecimal evaluateOperator(Stack<Token> operands, Operator operator) {
-        BigDecimal valB = null, valA = null;
+        BigDecimal valB, valA = null;
         Token opB = operands.pop();
         checkNotLeftParenthesis(opB);
         valB = ((Operand)opB).getValue();
@@ -112,7 +116,7 @@ public class Evaluator {
             valA = ((Operand)opA).getValue();
         }
 
-        return operator.eval(valB, valA);
+        return operator.eval(valA, valB);
     }
 
     private static void checkNotLeftParenthesis(Token token) {
